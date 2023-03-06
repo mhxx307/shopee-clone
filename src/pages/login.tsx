@@ -1,8 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { Button, InputField } from 'src/components/shared';
+import { useMutation } from 'react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+
+import { Button, InputField } from 'src/components/shared';
+import { login } from 'src/services/auth.service';
+import { toast } from 'react-toastify';
+import { isAxiosUnprocessableEntityError } from 'src/utils';
+import { ResponseApi } from 'src/types/util.type.ts';
 interface FormData {
     email: string;
     password: string;
@@ -29,7 +35,13 @@ const schema = yup
     .required();
 
 function LoginPage() {
-    const { handleSubmit, control } = useForm<FormData>({
+    const loginMutation = useMutation({
+        mutationFn: (body: FormData) => {
+            return login(body);
+        },
+    });
+
+    const { handleSubmit, control, setError, reset } = useForm<FormData>({
         defaultValues: {
             email: '',
             password: '',
@@ -38,7 +50,40 @@ function LoginPage() {
     });
 
     const handleLogin = (payload: FormData) => {
-        console.log(payload);
+        loginMutation.mutate(payload, {
+            onSuccess: (data) => {
+                toast.success(data.data.message);
+                reset();
+            },
+            onError: (error) => {
+                if (
+                    isAxiosUnprocessableEntityError<
+                        ResponseApi<Omit<FormData, 'confirmPassword'>>
+                    >(error)
+                ) {
+                    const formError = error.response?.data.data;
+                    if (formError) {
+                        Object.keys(formError).forEach((key) => {
+                            setError(
+                                key as keyof Omit<FormData, 'confirmPassword'>,
+                                {
+                                    type: 'server',
+                                    message:
+                                        formError[
+                                            key as keyof Omit<
+                                                FormData,
+                                                'confirmPassword'
+                                            >
+                                        ],
+                                },
+                            );
+                        });
+                    }
+                } else {
+                    console.log(error);
+                }
+            },
+        });
     };
 
     return (
@@ -70,6 +115,7 @@ function LoginPage() {
                                     primary
                                     type="submit"
                                     className="flex w-full items-center justify-center py-4"
+                                    isLoading={loginMutation.isLoading}
                                 >
                                     Đăng nhập
                                 </Button>

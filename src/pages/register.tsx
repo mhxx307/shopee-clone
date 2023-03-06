@@ -48,7 +48,7 @@ function RegisterPage() {
         },
     });
 
-    const { handleSubmit, control, setError } = useForm<FormData>({
+    const { handleSubmit, control, setError, reset } = useForm<FormData>({
         defaultValues: {
             email: '',
             password: '',
@@ -61,7 +61,8 @@ function RegisterPage() {
         const body = omit(payload, ['confirmPassword']);
         registerMutation.mutate(body, {
             onSuccess: (data) => {
-                toast.success(`Đăng ký thành công! ${data.data.message}`);
+                toast.success(data.data.message);
+                reset();
             },
             onError: (error) => {
                 if (
@@ -130,6 +131,7 @@ function RegisterPage() {
                                     primary
                                     type="submit"
                                     className="flex w-full items-center justify-center py-4"
+                                    isLoading={registerMutation.isLoading}
                                 >
                                     Đăng ký
                                 </Button>
