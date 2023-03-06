@@ -7,6 +7,9 @@ import * as yup from 'yup';
 import { Button, InputField } from 'src/components/shared';
 import { register } from 'src/services/auth.service';
 import { omit } from 'lodash';
+import { isAxiosUnprocessableEntityError } from 'src/utils';
+import { ResponseApi } from 'src/types/util.type.ts';
+import { toast } from 'react-toastify';
 
 interface FormData {
     email: string;
@@ -45,7 +48,7 @@ function RegisterPage() {
         },
     });
 
-    const { handleSubmit, control } = useForm<FormData>({
+    const { handleSubmit, control, setError } = useForm<FormData>({
         defaultValues: {
             email: '',
             password: '',
@@ -57,7 +60,37 @@ function RegisterPage() {
     const handleRegister = (payload: FormData) => {
         const body = omit(payload, ['confirmPassword']);
         registerMutation.mutate(body, {
-            onSuccess: (data) => console.log(data),
+            onSuccess: (data) => {
+                toast.success(`Đăng ký thành công! ${data.data.message}`);
+            },
+            onError: (error) => {
+                if (
+                    isAxiosUnprocessableEntityError<
+                        ResponseApi<Omit<FormData, 'confirmPassword'>>
+                    >(error)
+                ) {
+                    const formError = error.response?.data.data;
+                    if (formError) {
+                        Object.keys(formError).forEach((key) => {
+                            setError(
+                                key as keyof Omit<FormData, 'confirmPassword'>,
+                                {
+                                    type: 'server',
+                                    message:
+                                        formError[
+                                            key as keyof Omit<
+                                                FormData,
+                                                'confirmPassword'
+                                            >
+                                        ],
+                                },
+                            );
+                        });
+                    }
+                } else {
+                    console.log(error);
+                }
+            },
         });
     };
 
@@ -98,7 +131,7 @@ function RegisterPage() {
                                     type="submit"
                                     className="flex w-full items-center justify-center py-4"
                                 >
-                                    Đăng nhập
+                                    Đăng ký
                                 </Button>
                             </div>
                             <div className="mt-8 flex items-center justify-center">
