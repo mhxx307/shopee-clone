@@ -6,12 +6,15 @@ function Footer() {
             <div className="mx-auto max-w-7xl space-y-10 px-4">
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <div className="lg:col-span-1">
-                        <p className="text-[#848484]">@ 2022 Shopee. Tất cả các quyền đều được bảo lưu</p>
+                        <p className="text-[#848484]">
+                            @ 2022 Shopee. Tất cả các quyền đều được bảo lưu
+                        </p>
                     </div>
                     <div className="lg:col-span-2">
                         <p className="text-[#848484]">
-                            Quốc gia & Khu vực: Singapore Indonesia Đài Loan Thái Lan Malaysia Việt Nam Philippines
-                            Brazil México Colombia Chile
+                            Quốc gia & Khu vực: Singapore Indonesia Đài Loan
+                            Thái Lan Malaysia Việt Nam Philippines Brazil México
+                            Colombia Chile
                         </p>
                     </div>
                 </div>

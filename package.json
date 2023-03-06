@@ -13,11 +13,18 @@
         "prettier:fix": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\""
     },
     "dependencies": {
+        "@hookform/resolvers": "^2.9.11",
+        "classnames": "^2.3.2",
+        "is-hotkey": "^0.2.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-router-dom": "^6.8.2"
+        "react-hook-form": "^7.43.4",
+        "react-icons": "^4.8.0",
+        "react-router-dom": "^6.8.2",
+        "yup": "^1.0.2"
     },
     "devDependencies": {
+        "@types/is-hotkey": "^0.1.7",
         "@types/node": "^18.14.6",
         "@types/react": "^18.0.24",
         "@types/react-dom": "^18.0.8",

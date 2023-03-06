@@ -3,12 +3,12 @@ import { Logo } from '../icons';
 
 function RegisterHeader() {
     return (
-        <header className="mx-auto max-w-7xl px-4">
-            <nav className="flex items-center">
-                <Link to="/" className="flex h-32 w-32 items-center">
+        <header className="container">
+            <nav className="flex items-center space-x-6">
+                <Link to="/" className="flex h-32 w-32">
                     <Logo className="fill-primary" />
                 </Link>
-                <p className="text-xl lg:text-2xl">Đăng ký</p>
+                <p className="text-xl lg:text-2xl">Xin chào</p>
             </nav>
         </header>
     );

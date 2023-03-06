@@ -49,7 +49,7 @@ module.exports = {
                 htmlWhitespaceSensitivity: 'css',
                 insertPragma: false,
                 jsxSingleQuote: false,
-                printWidth: 120,
+                printWidth: 80,
                 proseWrap: 'preserve',
                 quoteProps: 'as-needed',
                 requirePragma: false,
@@ -60,6 +60,16 @@ module.exports = {
                 useTabs: false,
                 vueIndentScriptAndStyle: false,
                 endOfLine: 'auto',
+            },
+        ],
+        // note you must disable the base rule as it can report incorrect errors
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': [
+            'warn', // or "error"
+            {
+                argsIgnorePattern: '^_',
+                varsIgnorePattern: '^_',
+                caughtErrorsIgnorePattern: '^_',
             },
         ],
     },
