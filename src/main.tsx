@@ -21,7 +21,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
                 <App />
-                <ReactQueryDevtools initialIsOpen={false} />
+                {process.env.NODE_ENV === 'development' && (
+                    <ReactQueryDevtools initialIsOpen={false} />
+                )}
             </QueryClientProvider>
         </BrowserRouter>
     </React.StrictMode>,

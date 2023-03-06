@@ -1,9 +1,12 @@
-import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import { useMutation } from 'react-query';
+import { Link } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { Button, InputField } from 'src/components/shared';
+import { register } from 'src/services/auth.service';
+import { omit } from 'lodash';
 
 interface FormData {
     email: string;
@@ -36,6 +39,12 @@ const schema = yup
     .required();
 
 function RegisterPage() {
+    const registerMutation = useMutation({
+        mutationFn: (body: Omit<FormData, 'confirmPassword'>) => {
+            return register(body);
+        },
+    });
+
     const { handleSubmit, control } = useForm<FormData>({
         defaultValues: {
             email: '',
@@ -46,7 +55,10 @@ function RegisterPage() {
     });
 
     const handleRegister = (payload: FormData) => {
-        console.log(payload);
+        const body = omit(payload, ['confirmPassword']);
+        registerMutation.mutate(body, {
+            onSuccess: (data) => console.log(data),
+        });
     };
 
     return (
