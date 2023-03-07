@@ -10,3 +10,15 @@ export function isAxiosUnprocessableEntityError<T>(
 ): error is AxiosError<T> {
     return isAxiosError(error) && error.response?.status === 422;
 }
+
+export function saveAccessToken(access_token: string) {
+    localStorage.setItem('access_token', access_token);
+}
+
+export function clearAccessToken() {
+    localStorage.removeItem('access_token');
+}
+
+export function getAccessToken() {
+    return localStorage.getItem('access_token') || '';
+}

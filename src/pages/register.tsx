@@ -8,8 +8,10 @@ import { Button, InputField } from 'src/components/shared';
 import { register } from 'src/services/auth.service';
 import { omit } from 'lodash';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
-import { ResponseApi } from 'src/types/util.type.ts';
+import { ErrorResponseApi } from 'src/types/util.type.ts';
 import { toast } from 'react-toastify';
+import { useContext } from 'react';
+import { AuthContext } from 'src/contexts/auth.context';
 
 interface FormData {
     email: string;
@@ -42,6 +44,8 @@ const schema = yup
     .required();
 
 function RegisterPage() {
+    const { setIsAuthenticated } = useContext(AuthContext);
+
     const registerMutation = useMutation({
         mutationFn: (body: Omit<FormData, 'confirmPassword'>) => {
             return register(body);
@@ -61,13 +65,14 @@ function RegisterPage() {
         const body = omit(payload, ['confirmPassword']);
         registerMutation.mutate(body, {
             onSuccess: (data) => {
+                setIsAuthenticated(true);
                 toast.success(data.data.message);
                 reset();
             },
             onError: (error) => {
                 if (
                     isAxiosUnprocessableEntityError<
-                        ResponseApi<Omit<FormData, 'confirmPassword'>>
+                        ErrorResponseApi<Omit<FormData, 'confirmPassword'>>
                     >(error)
                 ) {
                     const formError = error.response?.data.data;

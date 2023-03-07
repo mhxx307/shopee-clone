@@ -1,5 +1,5 @@
 import { User } from './user.type';
-import { ResponseApi } from './util.type.ts';
+import { SuccessResponseApi } from './util.type.ts';
 
 export interface data {
     access_token: string;
@@ -7,4 +7,4 @@ export interface data {
     user: User;
 }
 
-export type AuthResponse = ResponseApi<data>;
+export type AuthResponse = SuccessResponseApi<data>;
