@@ -1,9 +1,10 @@
 import { Footer, RegisterHeader } from '../partials';
+import { ILayout } from './MainLayout';
 
-function RegisterLayout({ children }: { children: React.ReactNode }) {
+function RegisterLayout({ children, isHeader = true }: ILayout) {
     return (
         <div className="flex h-screen flex-col justify-between">
-            <RegisterHeader />
+            {isHeader && <RegisterHeader />}
             <div className="flex-grow">{children}</div>
             <Footer />
         </div>

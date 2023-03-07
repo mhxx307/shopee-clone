@@ -24,6 +24,11 @@ module.exports = {
                     paddingLeft: theme('spacing.4'),
                     paddingRight: theme('spacing.4'),
                 },
+                '.flex-center': {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                },
             });
         }),
     ],

@@ -1,9 +1,16 @@
 import { useRoutes } from 'react-router';
-import { RegisterLayout } from './components/layouts';
+import { MainLayout, RegisterLayout } from './components/layouts';
 import { HomePage, LoginPage, RegisterPage } from './pages';
 
 const routes = [
-    { path: '/', element: <HomePage /> },
+    {
+        path: '/',
+        element: (
+            <MainLayout>
+                <HomePage />
+            </MainLayout>
+        ),
+    },
     {
         path: '/login',
         element: (
