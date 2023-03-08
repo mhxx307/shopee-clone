@@ -21,4 +21,13 @@ const FOOTER_ADDRESS = [
     { id: 4, name: '© 2015 - Bản quyền thuộc về Công ty TNHH Shopee' },
 ];
 
-export { FOOTER_NAV, FOOTER_ADDRESS };
+const path = {
+    home: '/',
+    profile: '/profile',
+    login: '/login',
+    register: '/register',
+    logout: '/logout',
+    purchase: '/history-purchase',
+};
+
+export { FOOTER_NAV, FOOTER_ADDRESS, path };

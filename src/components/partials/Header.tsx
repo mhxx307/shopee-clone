@@ -7,7 +7,7 @@ import NavHeader from './NavHeader';
 
 function Header() {
     return (
-        <header className="bg-gradient-to-r from-[#f53d2d] to-[#f63]">
+        <header className="bg-[linear-gradient(-180deg,#f53d2d,#f63)]">
             <div className="container">
                 <NavHeader />
 

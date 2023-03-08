@@ -2,7 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
-import * as yup from 'yup';
 
 import { Button, InputField } from 'src/components/shared';
 import { register } from 'src/services/auth.service';
@@ -12,6 +11,8 @@ import { ErrorResponseApi } from 'src/types/util.type.ts';
 import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AuthContext } from 'src/contexts/auth.context';
+import { path } from 'src/constants';
+import { useSchemaValidate } from 'src/hooks';
 
 interface FormData {
     email: string;
@@ -19,32 +20,8 @@ interface FormData {
     confirmPassword: string;
 }
 
-const schema = yup
-    .object({
-        email: yup
-            .string()
-            .required('Please enter your email')
-            .matches(
-                /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
-                'Incorrect format of email',
-            ),
-        password: yup
-            .string()
-            .required('Please enter your password')
-            .min(8, 'Password must be at least 8 characters long')
-            .matches(
-                /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm,
-                'At least 8 characters must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number Can contain special characters.',
-            ),
-        confirmPassword: yup
-            .string()
-            .required('Please retype your password.')
-            .oneOf([yup.ref('password')], 'Your passwords do not match.'),
-    })
-    .required();
-
 function RegisterPage() {
-    const { setIsAuthenticated } = useContext(AuthContext);
+    const { setIsAuthenticated, setProfile } = useContext(AuthContext);
 
     const registerMutation = useMutation({
         mutationFn: (body: Omit<FormData, 'confirmPassword'>) => {
@@ -52,6 +29,7 @@ function RegisterPage() {
         },
     });
 
+    const schema = useSchemaValidate('register');
     const { handleSubmit, control, setError, reset } = useForm<FormData>({
         defaultValues: {
             email: '',
@@ -66,6 +44,7 @@ function RegisterPage() {
         registerMutation.mutate(body, {
             onSuccess: (data) => {
                 setIsAuthenticated(true);
+                setProfile(data.data.data.user);
                 toast.success(data.data.message);
                 reset();
             },
@@ -145,7 +124,10 @@ function RegisterPage() {
                                 <span className="text-gray-400">
                                     Bạn đã có tài khoản ?
                                 </span>
-                                <Link className="ml-1 text-red-400" to="/login">
+                                <Link
+                                    className="ml-1 text-red-400"
+                                    to={path.login}
+                                >
                                     Đăng nhập
                                 </Link>
                             </div>

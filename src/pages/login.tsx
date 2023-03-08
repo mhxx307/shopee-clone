@@ -2,7 +2,6 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 
 import { Button, InputField } from 'src/components/shared';
 import { login } from 'src/services/auth.service';
@@ -11,33 +10,14 @@ import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
 import { useContext } from 'react';
 import { AuthContext } from 'src/contexts/auth.context';
+import { useSchemaValidate } from 'src/hooks';
 interface FormData {
     email: string;
     password: string;
 }
 
-const schema = yup
-    .object({
-        email: yup
-            .string()
-            .required('Please enter your email')
-            .matches(
-                /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
-                'Incorrect format of email',
-            ),
-        password: yup
-            .string()
-            .required('Please enter your password')
-            .min(8, 'Password must be at least 8 characters long')
-            .matches(
-                /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm,
-                'At least 8 characters must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number Can contain special characters.',
-            ),
-    })
-    .required();
-
 function LoginPage() {
-    const { setIsAuthenticated } = useContext(AuthContext);
+    const { setIsAuthenticated, setProfile } = useContext(AuthContext);
 
     const loginMutation = useMutation({
         mutationFn: (body: FormData) => {
@@ -45,6 +25,7 @@ function LoginPage() {
         },
     });
 
+    const schema = useSchemaValidate('login');
     const { handleSubmit, control, setError, reset } = useForm<FormData>({
         defaultValues: {
             email: '',
@@ -57,6 +38,7 @@ function LoginPage() {
         loginMutation.mutate(payload, {
             onSuccess: (data) => {
                 setIsAuthenticated(true);
+                setProfile(data.data.data.user);
                 toast.success(data.data.message);
                 reset();
             },

@@ -1,7 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import { toast } from 'react-toastify';
+import { path } from 'src/constants';
 import { AuthResponse } from 'src/types/auth.type';
-import { clearAccessToken, getAccessToken, saveAccessToken } from '.';
+import {
+    clearLocalStorage,
+    getAccessToken,
+    saveAccessToken,
+    saveProfile,
+} from '.';
 
 /*
  * dùng attr access_token để lưu token thay vì dùng thẳng getAccessToken()
@@ -38,13 +44,14 @@ class Http {
         this.instance.interceptors.response.use(
             (response) => {
                 const { url } = response.config;
-                if (url === '/login' || url === '/register') {
-                    this.accessToken = (response.data as AuthResponse).data
-                        .access_token as string;
+                if (url === path.login || url === path.register) {
+                    const data = (response.data as AuthResponse).data;
+                    this.accessToken = data.access_token as string;
                     saveAccessToken(this.accessToken);
-                } else if (url === '/logout') {
+                    saveProfile(data.user);
+                } else if (url === path.logout) {
                     this.accessToken = '';
-                    clearAccessToken();
+                    clearLocalStorage();
                 }
                 return response;
             },

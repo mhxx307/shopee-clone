@@ -1,4 +1,8 @@
+import { useContext } from 'react';
+import { AuthContext } from 'src/contexts/auth.context';
+
 function Avatar() {
+    const { profile } = useContext(AuthContext);
     return (
         <div className="flex-center cursor-pointer">
             <div className="mr-2 h-6 w-6 flex-shrink-0">
@@ -8,7 +12,7 @@ function Avatar() {
                     className="h-full w-full rounded-full object-cover"
                 />
             </div>
-            <p>La Võ Minh Quân</p>
+            <p>{profile?.email}</p>
         </div>
     );
 }

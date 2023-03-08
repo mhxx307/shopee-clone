@@ -8,14 +8,17 @@ import { useContext } from 'react';
 import { logout } from 'src/services/auth.service';
 import { AuthContext } from 'src/contexts/auth.context';
 import { Avatar, Button, Popover } from 'src/components/shared';
+import { path } from 'src/constants';
 
 function NavHeader() {
-    const { setIsAuthenticated, isAuthenticated } = useContext(AuthContext);
+    const { setIsAuthenticated, isAuthenticated, setProfile } =
+        useContext(AuthContext);
 
     const logoutMutation = useMutation({
         mutationFn: logout,
         onSuccess: () => {
             setIsAuthenticated(false);
+            setProfile(null);
             toast.success('Logout successfully');
         },
     });
@@ -56,13 +59,13 @@ function NavHeader() {
                     renderPopover={
                         <div className="relative rounded-sm border border-gray-200 bg-white shadow-md">
                             <Link
-                                to={'/profile'}
+                                to={path.profile}
                                 className="block w-full bg-white py-3 px-4 text-left hover:bg-slate-100 hover:text-cyan-500"
                             >
                                 Tài khoản của tôi
                             </Link>
                             <Link
-                                to={'history-purchase'}
+                                to={path.purchase}
                                 className="block w-full bg-white py-3 px-4 text-left hover:bg-slate-100 hover:text-cyan-500"
                             >
                                 Đơn mua
@@ -83,14 +86,14 @@ function NavHeader() {
             ) : (
                 <div className="flex items-center">
                     <Link
-                        to="/register"
+                        to={path.register}
                         className="mx-3 capitalize hover:text-white/70"
                     >
                         Đăng ký
                     </Link>
                     <div className="border-r-[1px] border-r-white/40" />
                     <Link
-                        to="/login"
+                        to={path.login}
                         className="mx-3 capitalize hover:text-white/70"
                     >
                         Đăng nhập
