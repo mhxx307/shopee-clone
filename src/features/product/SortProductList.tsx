@@ -1,4 +1,4 @@
-export default function SortProductList() {
+const SortProductList = () => {
     return (
         <div className="bg-gray-300/40 py-4 px-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -68,4 +68,6 @@ export default function SortProductList() {
             </div>
         </div>
     );
-}
+};
+
+export default SortProductList;

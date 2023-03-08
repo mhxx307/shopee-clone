@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useMutation } from 'react-query';
 import { useContext } from 'react';
 
-import { logout } from 'src/services/auth.service';
+import authService from 'src/services/auth.service';
 import { AuthContext } from 'src/contexts/auth.context';
 import { Avatar, Button, Popover } from 'src/components/shared';
 import { path } from 'src/constants';
@@ -15,7 +15,7 @@ function NavHeader() {
         useContext(AuthContext);
 
     const logoutMutation = useMutation({
-        mutationFn: logout,
+        mutationFn: authService.logout,
         onSuccess: () => {
             setIsAuthenticated(false);
             setProfile(null);
@@ -48,6 +48,7 @@ function NavHeader() {
                     secondary
                     RightIcon={BsChevronDown}
                     LeftIcon={AiOutlineGlobal}
+                    className="text-white/80"
                 >
                     Tiếng Việt
                 </Button>

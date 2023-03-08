@@ -28,6 +28,18 @@ const path = {
     register: '/register',
     logout: '/logout',
     purchase: '/history-purchase',
-};
+} as const;
 
-export { FOOTER_NAV, FOOTER_ADDRESS, path };
+const productSortBy = {
+    createAt: 'createAt',
+    sold: 'sold',
+    view: 'view',
+    price: 'price',
+} as const;
+
+const productOrderBy = {
+    asc: 'asc',
+    desc: 'desc',
+} as const;
+
+export { FOOTER_NAV, FOOTER_ADDRESS, path, productSortBy, productOrderBy };

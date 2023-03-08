@@ -4,7 +4,7 @@ import { useMutation } from 'react-query';
 import { Link } from 'react-router-dom';
 
 import { Button, InputField } from 'src/components/shared';
-import { register } from 'src/services/auth.service';
+import authService from 'src/services/auth.service';
 import { omit } from 'lodash';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
@@ -25,7 +25,7 @@ function RegisterPage() {
 
     const registerMutation = useMutation({
         mutationFn: (body: Omit<FormData, 'confirmPassword'>) => {
-            return register(body);
+            return authService.register(body);
         },
     });
 

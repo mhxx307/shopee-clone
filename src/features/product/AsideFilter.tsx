@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button, Input } from 'src/components/shared';
 import { path } from 'src/constants';
 
-export default function AsideFilter() {
+const AsideFilter = () => {
     return (
         <div className="py-4">
             <Link to={path.home} className="flex items-center font-bold">
@@ -216,4 +216,6 @@ export default function AsideFilter() {
             <Button primary>Xóa tất cả</Button>
         </div>
     );
-}
+};
+
+export default AsideFilter;

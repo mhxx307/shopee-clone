@@ -12,7 +12,7 @@ function Avatar() {
                     className="h-full w-full rounded-full object-cover"
                 />
             </div>
-            <p>{profile?.email}</p>
+            <p className="text-white/80">{profile?.email}</p>
         </div>
     );
 }

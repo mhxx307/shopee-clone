@@ -1,8 +1,20 @@
-import AsideFilter from 'src/components/features/product/AsideFilter';
-import Product from 'src/components/features/product/Product';
-import SortProductList from 'src/components/features/product/SortProductList';
+import { useQuery } from 'react-query';
+
+import { AsideFilter, SortProductList, Product } from 'src/features/product';
+import { useQueryParams } from 'src/hooks';
+import productService from 'src/services/product.service';
 
 function HomePage() {
+    const queryParams = useQueryParams();
+    const { data } = useQuery({
+        queryKey: ['products', queryParams],
+        queryFn: () => {
+            return productService.getProducts(queryParams);
+        },
+    });
+
+    console.log(data);
+
     return (
         <div className="container">
             <div className="grid grid-cols-12 gap-6">

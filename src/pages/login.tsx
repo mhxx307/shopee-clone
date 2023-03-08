@@ -4,7 +4,7 @@ import { useMutation } from 'react-query';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { Button, InputField } from 'src/components/shared';
-import { login } from 'src/services/auth.service';
+import authService from 'src/services/auth.service';
 import { toast } from 'react-toastify';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
@@ -21,7 +21,7 @@ function LoginPage() {
 
     const loginMutation = useMutation({
         mutationFn: (body: FormData) => {
-            return login(body);
+            return authService.login(body);
         },
     });
 
