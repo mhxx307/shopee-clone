@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query';
+import { Pagination } from 'src/components/shared';
 
 import { AsideFilter, SortProductList, Product } from 'src/features/product';
 import { useQueryParams } from 'src/hooks';
@@ -24,13 +25,14 @@ function HomePage() {
                 <div className="col-span-9">
                     <SortProductList />
                     <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                        <div className="col-span-1">
-                            <Product />
-                        </div>
-                        <div className="col-span-1">
-                            <Product />
-                        </div>
+                        {data &&
+                            data.data.data.products.map((product) => (
+                                <div className="col-span-1" key={product._id}>
+                                    <Product product={product} />
+                                </div>
+                            ))}
                     </div>
+                    <Pagination />
                 </div>
             </div>
         </div>

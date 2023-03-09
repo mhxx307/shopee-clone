@@ -15,6 +15,7 @@ export interface Product {
     view: number;
     createAt: string;
     updateAt: string;
+    price: number;
 }
 
 export interface ProductList {
