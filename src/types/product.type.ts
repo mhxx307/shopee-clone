@@ -31,10 +31,11 @@ export interface ProductListConfig {
     page?: number | string;
     limit?: number | string;
     sort_by?: 'createAt' | 'view' | 'sold' | 'price';
-    order_by?: 'asc' | 'desc';
+    order?: 'asc' | 'desc';
     exclude?: string;
     rating_filter?: number | string;
     price_max?: number | string;
     price_min?: number | string;
     name?: string;
+    category?: string;
 }

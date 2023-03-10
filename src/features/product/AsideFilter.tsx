@@ -1,8 +1,18 @@
-import { Link } from 'react-router-dom';
+import classNames from 'classnames';
+import { createSearchParams, Link } from 'react-router-dom';
 import { Button, Input } from 'src/components/shared';
 import { path } from 'src/constants';
+import { QueryConfig } from 'src/pages/home';
+import { Category } from 'src/types/category.type';
 
-const AsideFilter = () => {
+interface Props {
+    queryConfig: QueryConfig;
+    categories: Category[];
+}
+
+const AsideFilter = ({ categories, queryConfig }: Props) => {
+    const { category: categoryId } = queryConfig;
+
     return (
         <div className="py-4">
             <Link to={path.home} className="flex items-center font-bold">
@@ -23,25 +33,36 @@ const AsideFilter = () => {
             </Link>
             <div className="my-4 h-[1px] bg-gray-300" />
             <ul>
-                <li className="py-2 pl-2">
-                    <Link
-                        to={path.home}
-                        className="relative px-2 font-semibold text-primary"
+                {categories.map((category) => (
+                    <li
+                        className="py-2 pl-2 hover:text-gray-500"
+                        key={category._id}
                     >
-                        <svg
-                            viewBox="0 0 4 7"
-                            className="absolute top-1 left-[-10px] h-2 w-2 fill-primary"
+                        <Link
+                            to={{
+                                pathname: path.home,
+                                search: createSearchParams({
+                                    ...queryConfig,
+                                    category: category._id,
+                                }).toString(),
+                            }}
+                            className={classNames('relative px-2', {
+                                'font-semibold text-primary':
+                                    categoryId === category._id,
+                            })}
                         >
-                            <polygon points="4 3.5 0 0 0 7" />
-                        </svg>
-                        Thời trang nam
-                    </Link>
-                </li>
-                <li className="py-2 pl-2">
-                    <Link to={path.home} className="relative px-2 ">
-                        Điện thoại
-                    </Link>
-                </li>
+                            {categoryId === category._id && (
+                                <svg
+                                    viewBox="0 0 4 7"
+                                    className="absolute top-1 left-[-10px] h-2 w-2 fill-current"
+                                >
+                                    <polygon points="4 3.5 0 0 0 7" />
+                                </svg>
+                            )}
+                            {category.name}
+                        </Link>
+                    </li>
+                ))}
             </ul>
             <Link
                 to={path.home}
