@@ -17,7 +17,6 @@ const Button = ({
             className={classNames(
                 'flex items-center space-x-2 rounded-md px-4 py-2 hover:bg-opacity-80',
                 className,
-                passProps.primary && 'text-white',
                 secondary && 'bg-transparent hover:bg-white/20',
             )}
             {...passProps}

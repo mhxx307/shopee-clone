@@ -3,7 +3,13 @@ import { Navigate, Outlet, useRoutes } from 'react-router';
 import { MainLayout, RegisterLayout } from './components/layouts';
 import { path } from './constants';
 import { AuthContext } from './contexts/auth.context';
-import { HomePage, LoginPage, ProfilePage, RegisterPage } from './pages';
+import {
+    HomePage,
+    LoginPage,
+    ProfilePage,
+    RegisterPage,
+    ProductDetailPage,
+} from './pages';
 
 function ProtectedRoute() {
     const { isAuthenticated } = useContext(AuthContext);
@@ -22,6 +28,15 @@ const routes = [
         element: (
             <MainLayout>
                 <HomePage />
+            </MainLayout>
+        ),
+    },
+    {
+        path: path.productDetail,
+        index: true,
+        element: (
+            <MainLayout>
+                <ProductDetailPage />
             </MainLayout>
         ),
     },
