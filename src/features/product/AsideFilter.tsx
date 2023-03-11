@@ -1,7 +1,12 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import classNames from 'classnames';
-import { createSearchParams, Link } from 'react-router-dom';
-import { Button, Input } from 'src/components/shared';
+import { omit } from 'lodash';
+import { useForm } from 'react-hook-form';
+import { createSearchParams, Link, useNavigate } from 'react-router-dom';
+
+import { Button, InputField } from 'src/components/shared';
 import { path } from 'src/constants';
+import { useSchemaValidate } from 'src/hooks';
 import { QueryConfig } from 'src/pages/home';
 import { Category } from 'src/types/category.type';
 
@@ -10,8 +15,48 @@ interface Props {
     categories: Category[];
 }
 
+interface FormState {
+    price_min: string;
+    price_max: string;
+}
+
 const AsideFilter = ({ categories, queryConfig }: Props) => {
+    const navigate = useNavigate();
     const { category: categoryId } = queryConfig;
+    const schema = useSchemaValidate('priceMinMax');
+    const { handleSubmit, control, reset } = useForm<FormState>({
+        defaultValues: {
+            price_min: '',
+            price_max: '',
+        },
+        resolver: yupResolver(schema),
+    });
+
+    const handleFilterByPrice = (payload: FormState) => {
+        navigate({
+            pathname: path.home,
+            search: createSearchParams({
+                ...queryConfig,
+                price_max: payload.price_max,
+                price_min: payload.price_min,
+            }).toString(),
+        });
+    };
+
+    const handleRemoveAll = () => {
+        reset();
+        navigate({
+            pathname: path.home,
+            search: createSearchParams(
+                omit(queryConfig, [
+                    'price_min',
+                    'price_max',
+                    'rating_filter',
+                    'category',
+                ]),
+            ).toString(),
+        });
+    };
 
     return (
         <div className="py-4">
@@ -90,25 +135,34 @@ const AsideFilter = ({ categories, queryConfig }: Props) => {
             <div className="my-4 h-[1px] bg-gray-300" />
             <div className="my-5">
                 <div>Khoản giá</div>
-                <form className="mt-2">
-                    <div className="flex items-start">
-                        <Input
+                <form
+                    className="mt-2"
+                    onSubmit={handleSubmit(handleFilterByPrice)}
+                >
+                    <div className="mb-2 flex items-start">
+                        <InputField
                             type="text"
+                            control={control}
                             className="grow"
-                            name="from"
+                            name="price_min"
                             placeholder="₫ TỪ"
-                            // classNameInput="p-1 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm"
+                            containerInputClassName="p-1 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm"
+                            onlyNumber
                         />
                         <div className="mx-2 mt-2 shrink-0">-</div>
-                        <Input
+                        <InputField
                             type="text"
+                            control={control}
                             className="grow"
-                            name="from"
+                            name="price_max"
                             placeholder="₫ ĐẾN"
-                            // classNameInput="p-1 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm"
+                            containerInputClassName="p-1 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm"
+                            onlyNumber
                         />
                     </div>
-                    <Button primary>Áp dụng</Button>
+                    <Button primary type="submit">
+                        Áp dụng
+                    </Button>
                 </form>
             </div>
             <div className="my-4 h-[1px] bg-gray-300" />
@@ -234,7 +288,9 @@ const AsideFilter = ({ categories, queryConfig }: Props) => {
                 </li>
             </ul>
             <div className="my-4 h-[1px] bg-gray-300" />
-            <Button primary>Xóa tất cả</Button>
+            <Button primary onClick={handleRemoveAll}>
+                Xóa tất cả
+            </Button>
         </div>
     );
 };
