@@ -51,3 +51,19 @@ export function formatNumberToSocialStyle(value: number) {
 export function rateSale(original: number, sale: number) {
     return Math.round(((original - sale) / original) * 100) + '%';
 }
+
+export const removeSpecialCharacter = (str: string) =>
+    str.replace(
+        // eslint-disable-next-line no-useless-escape
+        /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
+        '',
+    );
+
+export const generateNameId = ({ name, id }: { name: string; id: string }) => {
+    return removeSpecialCharacter(name).replace(/\s/g, '-') + `-i,${id}`;
+};
+
+export const getIdFromNameId = (nameId: string) => {
+    const arr = nameId.split('-i,');
+    return arr[arr.length - 1];
+};

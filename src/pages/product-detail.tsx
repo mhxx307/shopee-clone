@@ -13,14 +13,20 @@ import { Button } from 'src/components/shared';
 import { ProductRating } from 'src/features/product';
 import { productService } from 'src/services';
 import { Product } from 'src/types/product.type';
-import { formatCurrency, formatNumberToSocialStyle, rateSale } from 'src/utils';
+import {
+    formatCurrency,
+    formatNumberToSocialStyle,
+    getIdFromNameId,
+    rateSale,
+} from 'src/utils';
 
 function ProductDetailPage() {
-    const { id } = useParams();
+    const { nameId } = useParams();
+    const id = getIdFromNameId(nameId as string);
     const { data: productData } = useQuery({
         queryKey: ['product', id],
         queryFn: () => {
-            return productService.getProductDetail(id as string);
+            return productService.getProductDetail(id);
         },
         keepPreviousData: true,
     });
