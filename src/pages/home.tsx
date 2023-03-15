@@ -1,9 +1,8 @@
-import { isUndefined, omitBy } from 'lodash';
 import { useQuery } from 'react-query';
 
 import { Pagination } from 'src/components/shared';
 import { AsideFilter, SortProductList, Product } from 'src/features/product';
-import { useQueryParams } from 'src/hooks';
+import { useQueryConfig } from 'src/hooks';
 import { categoryService, productService } from 'src/services';
 import { ProductListConfig } from 'src/types/product.type';
 
@@ -12,22 +11,7 @@ export type QueryConfig = {
 };
 
 function HomePage() {
-    const queryParams: QueryConfig = useQueryParams();
-    const queryConfig: QueryConfig = omitBy(
-        {
-            page: queryParams.page || '1',
-            limit: queryParams.limit || '20',
-            sort_by: queryParams.sort_by,
-            order: queryParams.order,
-            exclude: queryParams.exclude,
-            name: queryParams.name,
-            price_max: queryParams.price_max,
-            price_min: queryParams.price_min,
-            rating_filter: queryParams.rating_filter,
-            category: queryParams.category,
-        },
-        isUndefined,
-    );
+    const queryConfig = useQueryConfig();
 
     const { data: productsData } = useQuery({
         queryKey: ['products', queryConfig],
@@ -35,6 +19,7 @@ function HomePage() {
             return productService.getProducts(queryConfig as ProductListConfig);
         },
         keepPreviousData: true,
+        staleTime: 3 * 60 * 1000, // 3 minutes
     });
 
     const { data: categoriesData } = useQuery({

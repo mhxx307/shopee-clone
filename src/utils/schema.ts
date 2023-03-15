@@ -43,6 +43,7 @@ const getSchema = () => {
                 message: 'Giá không phù hợp',
                 test: testPriceMinMax,
             }),
+            name: yup.string().required(),
         })
         .required();
 
@@ -50,3 +51,7 @@ const getSchema = () => {
 };
 
 export default getSchema;
+
+const schema = getSchema();
+
+export type Schema = yup.InferType<typeof schema>;

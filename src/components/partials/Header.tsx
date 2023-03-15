@@ -1,11 +1,47 @@
+import { useForm } from 'react-hook-form';
 import { AiOutlineSearch, AiOutlineShoppingCart } from 'react-icons/ai';
-import { Link } from 'react-router-dom';
+import { createSearchParams, Link, useNavigate } from 'react-router-dom';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { omit } from 'lodash';
 
 import { Logo } from 'src/components/icons';
 import { Button, Popover } from 'src/components/shared';
+import { useQueryConfig } from 'src/hooks';
 import NavHeader from './NavHeader';
+import getSchema, { Schema } from 'src/utils/schema';
+import { path } from 'src/constants';
+
+type FormData = Pick<Schema, 'name'>;
+const schema = getSchema().pick(['name']);
 
 function Header() {
+    const queryConfig = useQueryConfig();
+    const navigate = useNavigate();
+
+    const { handleSubmit, register } = useForm<FormData>({
+        resolver: yupResolver(schema),
+    });
+
+    const handleSearch = (data: FormData) => {
+        const config = queryConfig.order
+            ? omit(
+                  {
+                      ...queryConfig,
+                      name: data.name,
+                  },
+                  ['order', 'sort_by'],
+              )
+            : {
+                  ...queryConfig,
+                  name: data.name,
+              };
+
+        navigate({
+            pathname: path.home,
+            search: createSearchParams(config).toString(),
+        });
+    };
+
     return (
         <header className="bg-[linear-gradient(-180deg,#f53d2d,#f63)]">
             <div className="container">
@@ -18,7 +54,10 @@ function Header() {
                         </Link>
                     </div>
 
-                    <form className="col-span-7">
+                    <form
+                        className="col-span-7"
+                        onSubmit={handleSubmit(handleSearch)}
+                    >
                         <label
                             htmlFor="default-search"
                             className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -31,6 +70,7 @@ function Header() {
                             </div>
                             <input
                                 type="search"
+                                {...register('name')}
                                 id="default-search"
                                 className="block w-full rounded-sm border-none border-gray-300 bg-gray-50 p-4 pl-10 text-sm text-gray-900 outline-none"
                                 placeholder="FREESHIP ĐƠN TỪ 0 Đ..."

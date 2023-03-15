@@ -10,9 +10,12 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { Button } from 'src/components/shared';
-import { ProductRating } from 'src/features/product';
+import { Product, ProductRating } from 'src/features/product';
 import { productService } from 'src/services';
-import { Product } from 'src/types/product.type';
+import {
+    Product as ProductType,
+    ProductListConfig,
+} from 'src/types/product.type';
 import {
     formatCurrency,
     formatNumberToSocialStyle,
@@ -32,6 +35,22 @@ function ProductDetailPage() {
     });
 
     const product = productData?.data.data;
+
+    const queryConfig: ProductListConfig = {
+        limit: '20',
+        page: '1',
+        category: product?.category._id,
+    };
+
+    const { data: productsData } = useQuery({
+        queryKey: ['products', queryConfig],
+        queryFn: () => {
+            return productService.getProducts(queryConfig);
+        },
+        keepPreviousData: true,
+        staleTime: 3 * 60 * 1000, // 3 minutes
+        enabled: Boolean(product),
+    });
 
     const imageRef = useRef<HTMLImageElement>(null);
 
@@ -56,7 +75,7 @@ function ProductDetailPage() {
     };
 
     const next = () => {
-        if (currentImagesIndex[1] < (product as Product).images.length) {
+        if (currentImagesIndex[1] < (product as ProductType).images.length) {
             setCurrentImagesIndex((prev) => [prev[0] + 1, prev[1] + 1]);
         }
     };
@@ -245,6 +264,22 @@ function ProductDetailPage() {
                                 __html: DOMPurify.sanitize(product.description), // * DOMPurify để loại bỏ các đoạn mã js
                             }}
                         />
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-6">
+                <div className="container">
+                    <h3 className="uppercase text-gray-400">
+                        Sản phẩm tương tự
+                    </h3>
+                    <div className="mt-6 grid grid-cols-3 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                        {productsData &&
+                            productsData.data.data.products.map((product) => (
+                                <div className="col-span-1" key={product._id}>
+                                    <Product product={product} />
+                                </div>
+                            ))}
                     </div>
                 </div>
             </div>
