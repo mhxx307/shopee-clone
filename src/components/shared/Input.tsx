@@ -16,6 +16,7 @@ export interface InputProps extends React.HTMLProps<HTMLInputElement> {
     rightIconOnClick?: () => void;
     label?: string;
     defaultLayout?: boolean;
+    onlyNumber?: boolean;
 }
 
 // first props is for ref, second props is for props
@@ -32,8 +33,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         leftIconOnClick,
         rightIconOnClick,
         className,
+        onlyNumber = false,
+        onChange,
         ...inputProps
     } = props;
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        if ((/^\d+$/.test(value) || value === '') && onChange) {
+            // Thực thi onChange callback từ bên ngoài truyền vào props
+            onChange(event);
+        }
+    };
 
     return (
         <div className={containerClassName}>
@@ -69,6 +80,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
                     )}
                     spellCheck={false}
                     {...inputProps}
+                    onChange={onlyNumber ? handleChange : onChange}
                 />
 
                 {RightIcon && (

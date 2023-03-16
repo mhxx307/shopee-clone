@@ -1,15 +1,11 @@
 import DOMPurify from 'dompurify';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-    AiOutlineMinus,
-    AiOutlinePlus,
-    AiOutlineShoppingCart,
-} from 'react-icons/ai';
+import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
-import { Button } from 'src/components/shared';
+import { Button, QuantityController } from 'src/components/shared';
 import { Product, ProductRating } from 'src/features/product';
 import { productService } from 'src/services';
 import {
@@ -24,6 +20,7 @@ import {
 } from 'src/utils';
 
 function ProductDetailPage() {
+    const [buyCount, setBuyCount] = useState(1);
     const { nameId } = useParams();
     const id = getIdFromNameId(nameId as string);
     const { data: productData } = useQuery({
@@ -110,6 +107,10 @@ function ProductDetailPage() {
     const handleRemoveZoom = () => {
         const image = imageRef.current as HTMLImageElement;
         image.removeAttribute('style');
+    };
+
+    const handleBuyCount = (count: number) => {
+        setBuyCount(count);
     };
 
     if (!product) {
@@ -222,19 +223,13 @@ function ProductDetailPage() {
                                 <div className="capitalize text-gray-500">
                                     Số lượng
                                 </div>
-                                <div className="ml-10 flex items-center">
-                                    <button className="flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600">
-                                        <AiOutlineMinus />
-                                    </button>
-                                    <input
-                                        type="text"
-                                        value={1}
-                                        className="flex-center h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-center text-gray-600"
-                                    />
-                                    <button className="flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600">
-                                        <AiOutlinePlus />
-                                    </button>
-                                </div>
+                                <QuantityController
+                                    onDecrease={handleBuyCount}
+                                    onIncrease={handleBuyCount}
+                                    onType={handleBuyCount}
+                                    value={buyCount}
+                                    max={product.quantity}
+                                />
                                 <div className="ml-6 text-sm text-gray-500">
                                     {product.quantity} sản phẩm có sẵn
                                 </div>
