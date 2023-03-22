@@ -1,8 +1,8 @@
 import { Product } from './product.type';
 
-export type PurchaseStatus = -1 | 1 | 2 | 3 | 4 | 5;
+export type purchasesStatus = -1 | 1 | 2 | 3 | 4 | 5;
 
-export type PurchaseListStatus = PurchaseStatus | 0;
+export type PurchaseListStatus = purchasesStatus | 0;
 
 export interface Purchase {
     _id: string;
@@ -13,5 +13,5 @@ export interface Purchase {
     createdAt: string;
     updatedAt: string;
     user: string;
-    status: PurchaseStatus;
+    status: purchasesStatus;
 }

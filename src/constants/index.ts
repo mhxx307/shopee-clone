@@ -29,6 +29,7 @@ const path = {
     logout: '/logout',
     purchase: '/history-purchase',
     productDetail: ':nameId',
+    cart: '/cart',
 } as const;
 
 const productSortBy = {

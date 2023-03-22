@@ -2,12 +2,15 @@ import DOMPurify from 'dompurify';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import { Button, QuantityController } from 'src/components/shared';
+import { purchasesStatus } from 'src/constants/purchase';
+import { useAuthContext } from 'src/contexts/auth.context';
 import { Product, ProductRating } from 'src/features/product';
-import { productService } from 'src/services';
+import { productService, purchaseService } from 'src/services';
 import {
     Product as ProductType,
     ProductListConfig,
@@ -20,9 +23,11 @@ import {
 } from 'src/utils';
 
 function ProductDetailPage() {
+    const { isAuthenticated } = useAuthContext();
     const [buyCount, setBuyCount] = useState(1);
     const { nameId } = useParams();
     const id = getIdFromNameId(nameId as string);
+    const queryClient = useQueryClient();
     const { data: productData } = useQuery({
         queryKey: ['product', id],
         queryFn: () => {
@@ -30,7 +35,6 @@ function ProductDetailPage() {
         },
         keepPreviousData: true,
     });
-
     const product = productData?.data.data;
 
     const queryConfig: ProductListConfig = {
@@ -48,6 +52,8 @@ function ProductDetailPage() {
         staleTime: 3 * 60 * 1000, // 3 minutes
         enabled: Boolean(product),
     });
+
+    const addToCartMutation = useMutation(purchaseService.addToCart);
 
     const imageRef = useRef<HTMLImageElement>(null);
 
@@ -111,6 +117,31 @@ function ProductDetailPage() {
 
     const handleBuyCount = (count: number) => {
         setBuyCount(count);
+    };
+
+    const handleAddToCart = () => {
+        if (isAuthenticated) {
+            addToCartMutation.mutate(
+                {
+                    product_id: product?._id as string,
+                    buy_count: buyCount,
+                },
+                {
+                    onSuccess: (data) => {
+                        toast.success(data.data.message, {
+                            toastId: data.data.message,
+                        });
+                        queryClient.invalidateQueries({
+                            queryKey: ['purchase', purchasesStatus.inCart],
+                        });
+                    },
+                },
+            );
+        } else {
+            toast.error('Bạn cần đăng nhập để thực hiện thao tác này', {
+                toastId: 'Bạn cần đăng nhập để thực hiện thao tác này',
+            });
+        }
     };
 
     if (!product) {
@@ -239,6 +270,7 @@ function ProductDetailPage() {
                                     primary
                                     outline
                                     LeftIcon={AiOutlineShoppingCart}
+                                    onClick={handleAddToCart}
                                 >
                                     Thêm vào giỏ hàng
                                 </Button>

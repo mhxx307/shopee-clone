@@ -1,8 +1,7 @@
-import { useContext } from 'react';
-import { AuthContext } from 'src/contexts/auth.context';
+import { useAuthContext } from 'src/contexts/auth.context';
 
 function Avatar() {
-    const { profile } = useContext(AuthContext);
+    const { profile } = useAuthContext();
     return (
         <div className="flex-center cursor-pointer">
             <div className="mr-2 h-6 w-6 flex-shrink-0">

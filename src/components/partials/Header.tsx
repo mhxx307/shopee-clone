@@ -10,9 +10,16 @@ import { useQueryConfig } from 'src/hooks';
 import NavHeader from './NavHeader';
 import getSchema, { Schema } from 'src/utils/schema';
 import { path } from 'src/constants';
+import { useQuery } from 'react-query';
+import { purchasesStatus } from 'src/constants/purchase';
+import { purchaseService } from 'src/services';
+import { formatCurrency } from 'src/utils';
+import noproduct from 'src/assets/images/no-product.png';
+import { useAuthContext } from 'src/contexts/auth.context';
 
 type FormData = Pick<Schema, 'name'>;
 const schema = getSchema().pick(['name']);
+const MAX_PURCHASES = 5;
 
 function Header() {
     const queryConfig = useQueryConfig();
@@ -21,6 +28,17 @@ function Header() {
     const { handleSubmit, register } = useForm<FormData>({
         resolver: yupResolver(schema),
     });
+
+    const { isAuthenticated } = useAuthContext();
+
+    const { data: purchasesInCartData } = useQuery({
+        queryKey: ['purchase', purchasesStatus.inCart],
+        queryFn: () =>
+            purchaseService.getPurchases({ status: purchasesStatus.inCart }),
+        enabled: isAuthenticated,
+    });
+
+    const purchasesInCart = purchasesInCartData?.data.data;
 
     const handleSearch = (data: FormData) => {
         const config = queryConfig.order
@@ -91,50 +109,94 @@ function Header() {
                             renderPopover={
                                 <div className="relative max-w-[400px] space-x-2 rounded-sm border border-gray-200 bg-white p-4 text-sm shadow-md">
                                     {/* header */}
-                                    <div className="p-2">
-                                        <p className="capitalize text-gray-400">
-                                            Sản phẩm mới thêm
-                                        </p>
-                                    </div>
-
-                                    {/* body */}
-                                    <div className="flex">
-                                        <div className="flex-shrink-0">
-                                            <img
-                                                src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                                                alt="product"
-                                                className="h-11 w-11 object-cover"
-                                            />
-                                        </div>
-                                        <div className="ml-2 flex-grow overflow-hidden">
-                                            <p className="truncate">
-                                                Lorem ipsum dolor sit amet
-                                                consectetur adipisicing elit.
-                                                Autem, odio possimus!
-                                                Consequatur excepturi a
-                                                repudiandae vel magnam atque
-                                                laudantium officiis
+                                    {purchasesInCart &&
+                                    purchasesInCart.length > 0 ? (
+                                        <div className="p-2">
+                                            <p className="capitalize text-gray-400">
+                                                Sản phẩm mới thêm
                                             </p>
-                                        </div>
-                                        <div className="ml-2 flex-shrink-0">
-                                            <span className="text-primary">
-                                                đ400.000
-                                            </span>
-                                        </div>
-                                    </div>
 
-                                    {/* footer */}
-                                    <div className="mt-6 flex items-center justify-between">
-                                        <p className="text-sx capitalize text-gray-500">
-                                            Thêm hàng vào giỏ
-                                        </p>
-                                        <Button primary>Xem giỏ hàng</Button>
-                                    </div>
+                                            {/* body */}
+                                            {purchasesInCart
+                                                .slice(0, MAX_PURCHASES)
+                                                .map((item) => (
+                                                    <div
+                                                        key={item._id}
+                                                        className="flex py-2 hover:bg-gray-100"
+                                                    >
+                                                        <div className="flex-shrink-0">
+                                                            <img
+                                                                src={
+                                                                    item.product
+                                                                        .image
+                                                                }
+                                                                alt={
+                                                                    item.product
+                                                                        .name
+                                                                }
+                                                                className="h-11 w-11 object-cover"
+                                                            />
+                                                        </div>
+                                                        <div className="ml-2 flex-grow overflow-hidden">
+                                                            <p className="truncate">
+                                                                {
+                                                                    item.product
+                                                                        .name
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                        <div className="ml-2 flex-shrink-0">
+                                                            <span className="text-primary">
+                                                                đ
+                                                                {formatCurrency(
+                                                                    item.product
+                                                                        .price,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                            {/* footer */}
+                                            <div className="mt-6 flex items-center justify-between">
+                                                <p className="text-sx capitalize text-gray-500">
+                                                    {purchasesInCart.length >
+                                                    MAX_PURCHASES
+                                                        ? purchasesInCart.length -
+                                                          MAX_PURCHASES
+                                                        : ''}{' '}
+                                                    Thêm hàng vào giỏ
+                                                </p>
+                                                <Link
+                                                    to={path.cart}
+                                                    className="rounded-sm bg-primary p-2 text-white hover:bg-opacity-80"
+                                                >
+                                                    Xem giỏ hàng
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex h-[300px] w-[300px] flex-col items-center justify-center p-2">
+                                            <img
+                                                src={noproduct}
+                                                alt="no purchase"
+                                                className="h-24 w-24"
+                                            />
+                                            <div className="mt-3 capitalize">
+                                                Chưa có sản phẩm
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             }
                         >
-                            <Link to="/cart">
+                            <Link to="/cart" className="relative">
                                 <AiOutlineShoppingCart className="cursor-pointer text-xl text-white lg:text-2xl" />
+                                {purchasesInCart && (
+                                    <span className="absolute -top-2 left-3 rounded-full bg-white px-[9px] py-[1px] text-xs text-primary">
+                                        {purchasesInCart.length}
+                                    </span>
+                                )}
                             </Link>
                         </Popover>
                     </div>

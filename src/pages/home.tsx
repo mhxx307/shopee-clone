@@ -31,7 +31,7 @@ function HomePage() {
     });
 
     return (
-        <div className="container">
+        <div className="container pb-4">
             {productsData && (
                 <div className="grid grid-cols-12 gap-6">
                     <div className="col-span-3">

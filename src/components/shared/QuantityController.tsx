@@ -17,7 +17,6 @@ function QuantityController({
     onDecrease,
     onType,
     value,
-    ...props
 }: QuantityControllerProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let _value = Number(event.target.value);
@@ -62,7 +61,6 @@ function QuantityController({
                 className="flex-center h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-center text-gray-600"
                 onlyNumber
                 onChange={handleChange}
-                {...props}
             />
             <button
                 className="flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600"

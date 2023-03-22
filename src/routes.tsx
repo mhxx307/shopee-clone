@@ -1,23 +1,23 @@
-import { useContext } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router';
 import { MainLayout, RegisterLayout } from './components/layouts';
 import { path } from './constants';
-import { AuthContext } from './contexts/auth.context';
+import { useAuthContext } from './contexts/auth.context';
 import {
     HomePage,
     LoginPage,
     ProfilePage,
     RegisterPage,
     ProductDetailPage,
+    CartPage,
 } from './pages';
 
 function ProtectedRoute() {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated } = useAuthContext();
     return isAuthenticated ? <Outlet /> : <Navigate to={path.login} />;
 }
 
 function RejectedRoute() {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated } = useAuthContext();
     return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />;
 }
 
@@ -49,6 +49,14 @@ const routes = [
                 element: (
                     <MainLayout>
                         <ProfilePage />
+                    </MainLayout>
+                ),
+            },
+            {
+                path: path.cart,
+                element: (
+                    <MainLayout>
+                        <CartPage />
                     </MainLayout>
                 ),
             },

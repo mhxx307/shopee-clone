@@ -2,17 +2,19 @@ import { AiOutlineGlobal } from 'react-icons/ai';
 import { BsChevronDown } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useMutation } from 'react-query';
-import { useContext } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
 
 import authService from 'src/services/auth.service';
-import { AuthContext } from 'src/contexts/auth.context';
+import { useAuthContext } from 'src/contexts/auth.context';
 import { Avatar, Button, Popover } from 'src/components/shared';
 import { path } from 'src/constants';
+import { purchasesStatus } from 'src/constants/purchase';
 
 function NavHeader() {
     const { setIsAuthenticated, isAuthenticated, setProfile } =
-        useContext(AuthContext);
+        useAuthContext();
+
+    const queryClient = useQueryClient();
 
     const logoutMutation = useMutation({
         mutationFn: authService.logout,
@@ -20,6 +22,9 @@ function NavHeader() {
             setIsAuthenticated(false);
             setProfile(null);
             toast.success('Logout successfully');
+            queryClient.removeQueries({
+                queryKey: ['purchase', purchasesStatus.inCart],
+            });
         },
     });
 
