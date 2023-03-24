@@ -21,6 +21,7 @@
         "classnames": "^2.3.2",
         "dompurify": "^3.0.1",
         "framer-motion": "^10.1.0",
+        "immer": "^9.0.21",
         "is-hotkey": "^0.2.0",
         "lodash": "^4.17.21",
         "react": "^18.2.0",

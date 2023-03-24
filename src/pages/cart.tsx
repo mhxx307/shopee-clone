@@ -1,10 +1,19 @@
+import produce from 'immer';
+import { keyBy } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { Button, QuantityController } from 'src/components/shared';
 import { path } from 'src/constants';
 import { purchasesStatus } from 'src/constants/purchase';
 import { purchaseService } from 'src/services';
+import { Purchase } from 'src/types/purchase.type';
 import { formatCurrency, generateNameId } from 'src/utils';
+
+interface ExtendedPurchases extends Purchase {
+    disable: boolean;
+    checked: boolean;
+}
 
 export default function Cart() {
     const { data: purchasesInCartData } = useQuery({
@@ -13,6 +22,47 @@ export default function Cart() {
             purchaseService.getPurchases({ status: purchasesStatus.inCart }),
     });
     const purchasesInCart = purchasesInCartData?.data.data;
+    const [extendedPurchases, setExtendedPurchases] = useState<
+        ExtendedPurchases[]
+    >([]);
+    const isAllChecked = extendedPurchases.every(
+        (purchase) => purchase.checked,
+    );
+
+    useEffect(() => {
+        setExtendedPurchases(() => {
+            return (
+                purchasesInCart?.map((purchase) => {
+                    return {
+                        ...purchase,
+                        disable: false,
+                        checked: false,
+                    };
+                }) || []
+            );
+        });
+    }, [purchasesInCart]);
+
+    const handleChecked =
+        (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+            setExtendedPurchases(
+                produce((draft) => {
+                    draft[index].checked = e.target.checked;
+                }),
+            );
+        };
+
+    const handleAllChecked = () => {
+        setExtendedPurchases((prev) => {
+            return prev.map((purchase) => {
+                return {
+                    ...purchase,
+                    checked: !isAllChecked,
+                };
+            });
+        });
+    };
+
     return (
         <div className="bg-neutral-100 py-16">
             <div className="container">
@@ -25,6 +75,8 @@ export default function Cart() {
                                         <input
                                             type="checkbox"
                                             className="accent-orange h-5 w-5"
+                                            checked={isAllChecked}
+                                            onChange={handleAllChecked}
                                         />
                                     </div>
                                     <div className="flex-grow text-black">
@@ -42,45 +94,30 @@ export default function Cart() {
                             </div>
                         </div>
                         <div className="my-3 rounded-sm bg-white p-5 shadow">
-                            {purchasesInCart?.map((purchase) => (
-                                <div
-                                    key={purchase._id}
-                                    className="mb-5 grid grid-cols-12 rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-sm text-gray-500 first:mt-0"
-                                >
-                                    <div className="col-span-6">
-                                        <div className="flex">
-                                            <div className="flex flex-shrink-0 items-center justify-center pr-3">
-                                                <input
-                                                    type="checkbox"
-                                                    className="accent-orange h-5 w-5"
-                                                />
-                                            </div>
-                                            <div className="flex-grow">
-                                                <div className="flex">
-                                                    <Link
-                                                        className="h-20 w-20 flex-shrink-0"
-                                                        to={`${
-                                                            path.home
-                                                        }${generateNameId({
-                                                            name: purchase
-                                                                .product.name,
-                                                            id: purchase.product
-                                                                ._id,
-                                                        })}`}
-                                                    >
-                                                        <img
-                                                            alt={
-                                                                purchase.product
-                                                                    .name
-                                                            }
-                                                            src={
-                                                                purchase.product
-                                                                    .image
-                                                            }
-                                                        />
-                                                    </Link>
-                                                    <div className="flex-grow px-2 pt-1 pb-2">
+                            {extendedPurchases.length > 0 &&
+                                extendedPurchases.map((purchase, index) => (
+                                    <div
+                                        key={purchase._id}
+                                        className="mb-5 grid grid-cols-12 rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-sm text-gray-500 first:mt-0"
+                                    >
+                                        <div className="col-span-6">
+                                            <div className="flex">
+                                                <div className="flex flex-shrink-0 items-center justify-center pr-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="accent-orange h-5 w-5"
+                                                        checked={
+                                                            purchase.checked
+                                                        }
+                                                        onChange={handleChecked(
+                                                            index,
+                                                        )}
+                                                    />
+                                                </div>
+                                                <div className="flex-grow">
+                                                    <div className="flex">
                                                         <Link
+                                                            className="h-20 w-20 flex-shrink-0"
                                                             to={`${
                                                                 path.home
                                                             }${generateNameId({
@@ -91,66 +128,98 @@ export default function Cart() {
                                                                     .product
                                                                     ._id,
                                                             })}`}
-                                                            className="line-clamp-2"
                                                         >
-                                                            {
-                                                                purchase.product
-                                                                    .name
-                                                            }
+                                                            <img
+                                                                alt={
+                                                                    purchase
+                                                                        .product
+                                                                        .name
+                                                                }
+                                                                src={
+                                                                    purchase
+                                                                        .product
+                                                                        .image
+                                                                }
+                                                            />
                                                         </Link>
+                                                        <div className="flex-grow px-2 pt-1 pb-2">
+                                                            <Link
+                                                                to={`${
+                                                                    path.home
+                                                                }${generateNameId(
+                                                                    {
+                                                                        name: purchase
+                                                                            .product
+                                                                            .name,
+                                                                        id: purchase
+                                                                            .product
+                                                                            ._id,
+                                                                    },
+                                                                )}`}
+                                                                className="line-clamp-2"
+                                                            >
+                                                                {
+                                                                    purchase
+                                                                        .product
+                                                                        .name
+                                                                }
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="col-span-6">
-                                        <div className="grid grid-cols-5 items-center">
-                                            <div className="col-span-2">
-                                                <div className="flex items-center justify-center">
-                                                    <span className="text-gray-300 line-through">
+                                        <div className="col-span-6">
+                                            <div className="grid grid-cols-5 items-center">
+                                                <div className="col-span-2">
+                                                    <div className="flex items-center justify-center">
+                                                        <span className="text-gray-300 line-through">
+                                                            ₫
+                                                            {formatCurrency(
+                                                                purchase.product
+                                                                    .price_before_discount,
+                                                            )}
+                                                        </span>
+                                                        <span className="ml-3">
+                                                            ₫
+                                                            {formatCurrency(
+                                                                purchase.product
+                                                                    .price,
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-1">
+                                                    <QuantityController
+                                                        max={
+                                                            purchase.product
+                                                                .quantity
+                                                        }
+                                                        value={
+                                                            purchase.buy_count
+                                                        }
+                                                        classNameWrapper="flex items-center"
+                                                    />
+                                                </div>
+                                                <div className="col-span-1">
+                                                    <span className="text-orange">
                                                         ₫
                                                         {formatCurrency(
                                                             purchase.product
-                                                                .price_before_discount,
-                                                        )}
-                                                    </span>
-                                                    <span className="ml-3">
-                                                        ₫
-                                                        {formatCurrency(
-                                                            purchase.product
-                                                                .price,
+                                                                .price *
+                                                                purchase.buy_count,
                                                         )}
                                                     </span>
                                                 </div>
-                                            </div>
-                                            <div className="col-span-1">
-                                                <QuantityController
-                                                    max={
-                                                        purchase.product
-                                                            .quantity
-                                                    }
-                                                    value={purchase.buy_count}
-                                                    classNameWrapper="flex items-center"
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <span className="text-orange">
-                                                    ₫
-                                                    {formatCurrency(
-                                                        purchase.product.price *
-                                                            purchase.buy_count,
-                                                    )}
-                                                </span>
-                                            </div>
-                                            <div className="col-span-1">
-                                                <button className="hover:text-orange bg-none text-black transition-colors">
-                                                    Xóa
-                                                </button>
+                                                <div className="col-span-1">
+                                                    <button className="hover:text-orange bg-none text-black transition-colors">
+                                                        Xóa
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
                 </div>
