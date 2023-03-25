@@ -1,7 +1,8 @@
+// eslint-disable-next-line import/no-named-as-default
 import produce from 'immer';
 import { keyBy } from 'lodash';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { Button, QuantityController } from 'src/components/shared';
 import { path } from 'src/constants';
@@ -16,7 +17,7 @@ interface ExtendedPurchases extends Purchase {
 }
 
 export default function Cart() {
-    const { data: purchasesInCartData } = useQuery({
+    const { data: purchasesInCartData, refetch } = useQuery({
         queryKey: ['purchases', { status: purchasesStatus.inCart }],
         queryFn: () =>
             purchaseService.getPurchases({ status: purchasesStatus.inCart }),
@@ -28,15 +29,24 @@ export default function Cart() {
     const isAllChecked = extendedPurchases.every(
         (purchase) => purchase.checked,
     );
+    const purchasesMutation = useMutation({
+        mutationFn: purchaseService.updatePurchase,
+        onSuccess: () => {
+            refetch();
+        },
+    });
 
     useEffect(() => {
-        setExtendedPurchases(() => {
+        setExtendedPurchases((prev) => {
+            const extendPurchasesObject = keyBy(prev, '_id');
             return (
                 purchasesInCart?.map((purchase) => {
                     return {
                         ...purchase,
                         disable: false,
-                        checked: false,
+                        checked: Boolean(
+                            extendPurchasesObject[purchase._id]?.checked,
+                        ),
                     };
                 }) || []
             );
@@ -61,6 +71,33 @@ export default function Cart() {
                 };
             });
         });
+    };
+
+    const handleQuantityChange = (
+        purchaseIndex: number,
+        value: number,
+        enable: boolean,
+    ) => {
+        if (enable) {
+            const purchase = extendedPurchases[purchaseIndex];
+            setExtendedPurchases(
+                produce((draft) => {
+                    draft[purchaseIndex].disable = true;
+                }),
+            );
+            purchasesMutation.mutate({
+                product_id: purchase.product._id,
+                buy_count: value,
+            });
+        }
+    };
+
+    const handleTypeQuantity = (purchaseIndex: number) => (value: number) => {
+        setExtendedPurchases(
+            produce((draft) => {
+                draft[purchaseIndex].buy_count = value;
+            }),
+        );
     };
 
     return (
@@ -193,12 +230,54 @@ export default function Cart() {
                                                     <QuantityController
                                                         max={
                                                             purchase.product
-                                                                .quantity
+                                                                .quantity + 1
                                                         }
+                                                        min={0}
                                                         value={
                                                             purchase.buy_count
                                                         }
                                                         classNameWrapper="flex items-center"
+                                                        onIncrease={(value) =>
+                                                            handleQuantityChange(
+                                                                index,
+                                                                value,
+                                                                value <=
+                                                                    purchase
+                                                                        .product
+                                                                        .quantity,
+                                                            )
+                                                        }
+                                                        onDecrease={(value) =>
+                                                            handleQuantityChange(
+                                                                index,
+                                                                value,
+                                                                value >= 1,
+                                                            )
+                                                        }
+                                                        onType={handleTypeQuantity(
+                                                            index,
+                                                        )}
+                                                        onFocusOutside={(
+                                                            value,
+                                                        ) =>
+                                                            handleQuantityChange(
+                                                                index,
+                                                                value,
+                                                                value >= 1 &&
+                                                                    value <=
+                                                                        purchase
+                                                                            .product
+                                                                            .quantity &&
+                                                                    value !==
+                                                                        (
+                                                                            purchasesInCart as Purchase[]
+                                                                        )[index]
+                                                                            .buy_count,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            purchase.disable
+                                                        }
                                                     />
                                                 </div>
                                                 <div className="col-span-1">

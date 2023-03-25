@@ -4,18 +4,22 @@ import Input, { InputProps } from './Input';
 
 interface QuantityControllerProps extends InputProps {
     max?: number;
+    min?: number;
     classNameWrapper?: string;
     onIncrease?: (value: number) => void;
     onDecrease?: (value: number) => void;
     onType?: (value: number) => void;
+    onFocusOutside?: (value: number) => void;
 }
 
 function QuantityController({
     max,
+    min = 1,
     classNameWrapper = 'ml-10',
     onIncrease,
     onDecrease,
     onType,
+    onFocusOutside,
     value,
 }: QuantityControllerProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,11 +44,15 @@ function QuantityController({
 
     const handleDecrease = () => {
         let _value = Number(value) - 1;
-        if (_value < 1) {
-            _value = 1;
+        if (_value < min) {
+            _value = min;
         }
 
         onDecrease && onDecrease(_value);
+    };
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+        onFocusOutside && onFocusOutside(Number(event.target.value));
     };
 
     return (
@@ -61,6 +69,7 @@ function QuantityController({
                 className="flex-center h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-center text-gray-600"
                 onlyNumber
                 onChange={handleChange}
+                onBlur={handleBlur}
             />
             <button
                 className="flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600"
