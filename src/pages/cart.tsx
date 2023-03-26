@@ -1,9 +1,10 @@
 // eslint-disable-next-line import/no-named-as-default
 import produce from 'immer';
 import { keyBy } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Button, QuantityController } from 'src/components/shared';
 import { path } from 'src/constants';
 import { purchasesStatus } from 'src/constants/purchase';
@@ -29,12 +30,44 @@ export default function Cart() {
     const isAllChecked = extendedPurchases.every(
         (purchase) => purchase.checked,
     );
-    const purchasesMutation = useMutation({
+    const updatePurchasesMutation = useMutation({
         mutationFn: purchaseService.updatePurchase,
         onSuccess: () => {
             refetch();
         },
     });
+    const buyProductsMutation = useMutation({
+        mutationFn: purchaseService.buyProducts,
+        onSuccess: () => {
+            refetch();
+        },
+    });
+    const deletePurchaseMutation = useMutation({
+        mutationFn: purchaseService.deletePurchase,
+        onSuccess: () => {
+            refetch();
+        },
+    });
+
+    const checkedPurchases = extendedPurchases.filter(
+        (purchase) => purchase.checked,
+    );
+    const checkedPurchasesCount = checkedPurchases.length;
+    const totalPrice = useMemo(() => {
+        return checkedPurchases.reduce((total, current) => {
+            return total + current.buy_count * current.product.price;
+        }, 0);
+    }, [checkedPurchases]);
+    const totalPriceSale = useMemo(() => {
+        return checkedPurchases.reduce((total, current) => {
+            return (
+                total +
+                current.buy_count *
+                    (current.product.price_before_discount -
+                        current.product.price)
+            );
+        }, 0);
+    }, [checkedPurchases]);
 
     useEffect(() => {
         setExtendedPurchases((prev) => {
@@ -85,7 +118,7 @@ export default function Cart() {
                     draft[purchaseIndex].disable = true;
                 }),
             );
-            purchasesMutation.mutate({
+            updatePurchasesMutation.mutate({
                 product_id: purchase.product._id,
                 buy_count: value,
             });
@@ -100,6 +133,32 @@ export default function Cart() {
         );
     };
 
+    const handleDeletePurchase = (purchaseIndex: number) => () => {
+        const purchase = extendedPurchases[purchaseIndex];
+        deletePurchaseMutation.mutate([purchase._id]);
+    };
+
+    const handleDeleteManyPurchase = () => {
+        const purchaseIds = checkedPurchases.map((purchase) => purchase._id);
+        deletePurchaseMutation.mutate(purchaseIds);
+    };
+
+    const handleBuyProduct = () => {
+        if (checkedPurchasesCount > 0) {
+            const body = checkedPurchases.map((purchase) => ({
+                product_id: purchase.product._id,
+                buy_count: purchase.buy_count,
+            }));
+            buyProductsMutation.mutate(body, {
+                onSuccess(data) {
+                    toast.success(data.data.message, {
+                        toastId: data.data.message,
+                    });
+                },
+            });
+        }
+    };
+
     return (
         <div className="bg-neutral-100 py-16">
             <div className="container">
@@ -111,7 +170,7 @@ export default function Cart() {
                                     <div className="flex flex-shrink-0 items-center justify-center pr-3">
                                         <input
                                             type="checkbox"
-                                            className="accent-orange h-5 w-5"
+                                            className="h-5 w-5 accent-primary"
                                             checked={isAllChecked}
                                             onChange={handleAllChecked}
                                         />
@@ -130,19 +189,19 @@ export default function Cart() {
                                 </div>
                             </div>
                         </div>
-                        <div className="my-3 rounded-sm bg-white p-5 shadow">
-                            {extendedPurchases.length > 0 &&
-                                extendedPurchases.map((purchase, index) => (
+                        {extendedPurchases.length > 0 && (
+                            <div className="my-3 rounded-sm bg-white p-5 shadow">
+                                {extendedPurchases.map((purchase, index) => (
                                     <div
                                         key={purchase._id}
-                                        className="mb-5 grid grid-cols-12 rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-sm text-gray-500 first:mt-0"
+                                        className="mb-5 grid grid-cols-12 items-center rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-sm text-gray-500 first:mt-0 "
                                     >
                                         <div className="col-span-6">
                                             <div className="flex">
                                                 <div className="flex flex-shrink-0 items-center justify-center pr-3">
                                                     <input
                                                         type="checkbox"
-                                                        className="accent-orange h-5 w-5"
+                                                        className="h-5 w-5 accent-primary"
                                                         checked={
                                                             purchase.checked
                                                         }
@@ -281,7 +340,7 @@ export default function Cart() {
                                                     />
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <span className="text-orange">
+                                                    <span className="text-primary">
                                                         ₫
                                                         {formatCurrency(
                                                             purchase.product
@@ -291,7 +350,12 @@ export default function Cart() {
                                                     </span>
                                                 </div>
                                                 <div className="col-span-1">
-                                                    <button className="hover:text-orange bg-none text-black transition-colors">
+                                                    <button
+                                                        className="bg-none text-black transition-colors hover:text-primary"
+                                                        onClick={handleDeletePurchase(
+                                                            index,
+                                                        )}
+                                                    >
                                                         Xóa
                                                     </button>
                                                 </div>
@@ -299,7 +363,8 @@ export default function Cart() {
                                         </div>
                                     </div>
                                 ))}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="sticky bottom-0 z-10 mt-8 flex flex-col rounded-sm border border-gray-100 bg-white p-5 shadow sm:flex-row sm:items-center">
@@ -307,13 +372,18 @@ export default function Cart() {
                         <div className="flex flex-shrink-0 items-center justify-center pr-3">
                             <input
                                 type="checkbox"
-                                className="accent-orange h-5 w-5"
+                                className="h-5 w-5 accent-primary"
+                                checked={isAllChecked}
+                                onChange={handleAllChecked}
                             />
                         </div>
                         <button className="mx-3 border-none bg-none">
-                            Chọn tất cả
+                            Chọn tất cả ({checkedPurchasesCount})
                         </button>
-                        <button className="mx-3 border-none bg-none">
+                        <button
+                            className="mx-3 border-none bg-none"
+                            onClick={handleDeleteManyPurchase}
+                        >
                             Xóa
                         </button>
                     </div>
@@ -322,18 +392,22 @@ export default function Cart() {
                         <div>
                             <div className="flex items-center sm:justify-end">
                                 <div>Tổng thanh toán (0 sản phẩm):</div>
-                                <div className="text-orange ml-2 text-2xl">
-                                    ₫{formatCurrency(138000)}
+                                <div className="ml-2 text-2xl text-primary">
+                                    ₫{formatCurrency(totalPrice)}
                                 </div>
                             </div>
                             <div className="flex items-center text-sm sm:justify-end">
                                 <div className="text-gray-500">Tiết kiệm</div>
-                                <div className="text-orange ml-6">
-                                    ₫{formatCurrency(138000)}
+                                <div className="ml-6 text-primary">
+                                    ₫{formatCurrency(totalPriceSale)}
                                 </div>
                             </div>
                         </div>
-                        <Button className="mt-5 flex h-10 w-52 items-center justify-center bg-red-500 text-sm uppercase text-white hover:bg-red-600 sm:ml-4 sm:mt-0">
+                        <Button
+                            onClick={handleBuyProduct}
+                            className="mt-5 flex h-10 w-52 items-center justify-center bg-red-500 text-sm uppercase text-white hover:bg-red-600 sm:ml-4 sm:mt-0"
+                            isLoading={buyProductsMutation.isLoading}
+                        >
                             Mua hàng
                         </Button>
                     </div>
