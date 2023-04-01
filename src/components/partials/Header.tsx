@@ -1,14 +1,10 @@
-import { useForm } from 'react-hook-form';
 import { AiOutlineSearch, AiOutlineShoppingCart } from 'react-icons/ai';
-import { createSearchParams, Link, useNavigate } from 'react-router-dom';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { omit } from 'lodash';
+import { Link } from 'react-router-dom';
 
 import { Logo } from 'src/components/icons';
 import { Button, Popover } from 'src/components/shared';
-import { useQueryConfig } from 'src/hooks';
+import { useSearchProducts } from 'src/hooks';
 import NavHeader from './NavHeader';
-import getSchema, { Schema } from 'src/utils/schema';
 import { path } from 'src/constants';
 import { useQuery } from 'react-query';
 import { purchasesStatus } from 'src/constants/purchase';
@@ -17,17 +13,10 @@ import { formatCurrency } from 'src/utils';
 import noproduct from 'src/assets/images/no-product.png';
 import { useAuthContext } from 'src/contexts/auth.context';
 
-type FormData = Pick<Schema, 'name'>;
-const schema = getSchema().pick(['name']);
 const MAX_PURCHASES = 5;
 
 function Header() {
-    const queryConfig = useQueryConfig();
-    const navigate = useNavigate();
-
-    const { handleSubmit, register } = useForm<FormData>({
-        resolver: yupResolver(schema),
-    });
+    const { register, onSubmitSearch } = useSearchProducts();
 
     const { isAuthenticated } = useAuthContext();
 
@@ -39,26 +28,6 @@ function Header() {
     });
 
     const purchasesInCart = purchasesInCartData?.data.data;
-
-    const handleSearch = (data: FormData) => {
-        const config = queryConfig.order
-            ? omit(
-                  {
-                      ...queryConfig,
-                      name: data.name,
-                  },
-                  ['order', 'sort_by'],
-              )
-            : {
-                  ...queryConfig,
-                  name: data.name,
-              };
-
-        navigate({
-            pathname: path.home,
-            search: createSearchParams(config).toString(),
-        });
-    };
 
     return (
         <header className="bg-[linear-gradient(-180deg,#f53d2d,#f63)]">
@@ -72,10 +41,7 @@ function Header() {
                         </Link>
                     </div>
 
-                    <form
-                        className="col-span-7"
-                        onSubmit={handleSubmit(handleSearch)}
-                    >
+                    <form className="col-span-7" onSubmit={onSubmitSearch}>
                         <label
                             htmlFor="default-search"
                             className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"

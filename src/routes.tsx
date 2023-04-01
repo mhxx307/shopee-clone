@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useRoutes } from 'react-router';
-import { MainLayout, RegisterLayout } from './components/layouts';
+import { CartLayout, MainLayout, RegisterLayout } from './components/layouts';
 import { path } from './constants';
 import { useAuthContext } from './contexts/auth.context';
 import {
@@ -55,9 +55,9 @@ const routes = [
             {
                 path: path.cart,
                 element: (
-                    <MainLayout>
+                    <CartLayout>
                         <CartPage />
-                    </MainLayout>
+                    </CartLayout>
                 ),
             },
         ],
