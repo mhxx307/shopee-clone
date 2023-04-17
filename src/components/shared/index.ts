@@ -7,3 +7,4 @@ export { default as Popover } from './Popover';
 export { default as Pagination } from './Pagination';
 export { default as QuantityController } from './QuantityController';
 export { default as CartHeader } from './CartHeader';
+export { default as DateSelect } from './DateSelect';
