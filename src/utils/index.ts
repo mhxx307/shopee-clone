@@ -12,6 +12,8 @@ export function isAxiosUnprocessableEntityError<T>(
     return isAxiosError(error) && error.response?.status === 422;
 }
 
+export const LocalStorageEventTarget = new EventTarget();
+
 export function saveAccessToken(access_token: string) {
     localStorage.setItem('access_token', access_token);
 }
@@ -19,6 +21,8 @@ export function saveAccessToken(access_token: string) {
 export function clearLocalStorage() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('profile');
+    const clearEvent = new Event('clearLocalStorage');
+    LocalStorageEventTarget.dispatchEvent(clearEvent);
 }
 
 export function getAccessToken() {

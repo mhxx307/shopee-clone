@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-import { AuthProvider } from './contexts/auth.context';
+import { AppProvider } from './contexts/app.context';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,9 +21,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-                <AuthProvider>
+                <AppProvider>
                     <App />
-                </AuthProvider>
+                </AppProvider>
                 {process.env.NODE_ENV === 'development' && (
                     <ReactQueryDevtools initialIsOpen={false} />
                 )}

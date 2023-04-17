@@ -5,14 +5,13 @@ import { toast } from 'react-toastify';
 import { useMutation, useQueryClient } from 'react-query';
 
 import authService from 'src/services/auth.service';
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 import { Avatar, Button, Popover } from 'src/components/shared';
 import { path } from 'src/constants';
 import { purchasesStatus } from 'src/constants/purchase';
 
 function NavHeader() {
-    const { setIsAuthenticated, isAuthenticated, setProfile } =
-        useAuthContext();
+    const { setIsAuthenticated, isAuthenticated, setProfile } = useAppContext();
 
     const queryClient = useQueryClient();
 

@@ -1,7 +1,7 @@
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 
 function Avatar() {
-    const { profile } = useAuthContext();
+    const { profile } = useAppContext();
     return (
         <div className="flex-center cursor-pointer">
             <div className="mr-2 h-6 w-6 flex-shrink-0">

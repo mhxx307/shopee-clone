@@ -49,14 +49,14 @@ function RatingStars({ queryConfig }: Props) {
                                     if (indexStar < 5 - index) {
                                         return (
                                             <AiFillStar
-                                                key={index}
+                                                key={indexStar}
                                                 className="h-5 w-5 fill-yellow-400"
                                             />
                                         );
                                     }
                                     return (
                                         <AiFillStar
-                                            key={index}
+                                            key={indexStar}
                                             className="h-5 w-5 fill-gray-300"
                                         />
                                     );

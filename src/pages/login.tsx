@@ -8,7 +8,7 @@ import authService from 'src/services/auth.service';
 import { toast } from 'react-toastify';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 import { useSchemaValidate } from 'src/hooks';
 interface FormData {
     email: string;
@@ -16,7 +16,7 @@ interface FormData {
 }
 
 function LoginPage() {
-    const { setIsAuthenticated, setProfile } = useAuthContext();
+    const { setIsAuthenticated, setProfile } = useAppContext();
 
     const loginMutation = useMutation({
         mutationFn: (body: FormData) => {

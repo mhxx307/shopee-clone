@@ -3,12 +3,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { Button, QuantityController } from 'src/components/shared';
 import { purchasesStatus } from 'src/constants/purchase';
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 import { Product, ProductRating } from 'src/features/product';
 import { productService, purchaseService } from 'src/services';
 import {
@@ -23,7 +23,8 @@ import {
 } from 'src/utils';
 
 function ProductDetailPage() {
-    const { isAuthenticated } = useAuthContext();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAppContext();
     const [buyCount, setBuyCount] = useState(1);
     const { nameId } = useParams();
     const id = getIdFromNameId(nameId as string);
@@ -142,6 +143,18 @@ function ProductDetailPage() {
                 toastId: 'Bạn cần đăng nhập để thực hiện thao tác này',
             });
         }
+    };
+
+    const handleBuyNow = async (e: any) => {
+        e.preventDefault();
+        const response = await purchaseService.addToCart({
+            product_id: product?._id as string,
+            buy_count: buyCount,
+        });
+        navigate(
+            { pathname: '/cart' },
+            { state: { purchaseId: response.data.data._id } },
+        );
     };
 
     if (!product) {
@@ -274,7 +287,9 @@ function ProductDetailPage() {
                                 >
                                     Thêm vào giỏ hàng
                                 </Button>
-                                <Button primary>Mua ngay</Button>
+                                <Button primary onClick={handleBuyNow}>
+                                    Mua ngay
+                                </Button>
                             </div>
                         </div>
                     </div>

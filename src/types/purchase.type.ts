@@ -15,3 +15,8 @@ export interface Purchase {
     user: string;
     status: purchasesStatus;
 }
+
+export interface ExtendedPurchases extends Purchase {
+    disable: boolean;
+    checked: boolean;
+}

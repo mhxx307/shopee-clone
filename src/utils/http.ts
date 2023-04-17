@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, HttpStatusCode } from 'axios';
 import { toast } from 'react-toastify';
 import { path } from 'src/constants';
 import { AuthResponse } from 'src/types/auth.type';
@@ -61,6 +61,10 @@ class Http {
                     toast.error(message, {
                         toastId: 'error',
                     });
+                }
+
+                if (error.response.status === HttpStatusCode.Unauthorized) {
+                    clearLocalStorage();
                 }
 
                 return Promise.reject(error);

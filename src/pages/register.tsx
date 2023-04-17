@@ -9,7 +9,7 @@ import { omit } from 'lodash';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
 import { toast } from 'react-toastify';
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 import { path } from 'src/constants';
 import { useSchemaValidate } from 'src/hooks';
 
@@ -20,7 +20,7 @@ interface FormData {
 }
 
 function RegisterPage() {
-    const { setIsAuthenticated, setProfile } = useAuthContext();
+    const { setIsAuthenticated, setProfile } = useAppContext();
 
     const registerMutation = useMutation({
         mutationFn: (body: Omit<FormData, 'confirmPassword'>) => {

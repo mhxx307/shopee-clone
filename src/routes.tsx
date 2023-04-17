@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useRoutes } from 'react-router';
 import { CartLayout, MainLayout, RegisterLayout } from './components/layouts';
 import { path } from './constants';
-import { useAuthContext } from './contexts/auth.context';
+import { useAppContext } from './contexts/app.context';
 import {
     HomePage,
     LoginPage,
@@ -12,12 +12,12 @@ import {
 } from './pages';
 
 function ProtectedRoute() {
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated } = useAppContext();
     return isAuthenticated ? <Outlet /> : <Navigate to={path.login} />;
 }
 
 function RejectedRoute() {
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated } = useAppContext();
     return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />;
 }
 

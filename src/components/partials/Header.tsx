@@ -11,14 +11,14 @@ import { purchasesStatus } from 'src/constants/purchase';
 import { purchaseService } from 'src/services';
 import { formatCurrency } from 'src/utils';
 import noproduct from 'src/assets/images/no-product.png';
-import { useAuthContext } from 'src/contexts/auth.context';
+import { useAppContext } from 'src/contexts/app.context';
 
 const MAX_PURCHASES = 5;
 
 function Header() {
     const { register, onSubmitSearch } = useSearchProducts();
 
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated } = useAppContext();
 
     const { data: purchasesInCartData } = useQuery({
         queryKey: ['purchase', purchasesStatus.inCart],
