@@ -5,11 +5,12 @@ import { useAppContext } from './contexts/app.context';
 import {
     HomePage,
     LoginPage,
-    ProfilePage,
     RegisterPage,
     ProductDetailPage,
     CartPage,
 } from './pages';
+import { ChangePasswordPage, ProfilePage, PurchasePage } from './pages/user';
+import UserLayout from './pages/user/layouts/UserLayout';
 
 function ProtectedRoute() {
     const { isAuthenticated } = useAppContext();
@@ -45,12 +46,27 @@ const routes = [
         element: <ProtectedRoute />,
         children: [
             {
-                path: path.profile,
+                path: path.user, // khi đi qua path user, trong user layout sẽ có outlet
+                // các component trong children sẽ được render vào outlet
                 element: (
                     <MainLayout>
-                        <ProfilePage />
+                        <UserLayout />
                     </MainLayout>
                 ),
+                children: [
+                    {
+                        path: path.profile,
+                        element: <ProfilePage />,
+                    },
+                    {
+                        path: path.changePassword,
+                        element: <ChangePasswordPage />,
+                    },
+                    {
+                        path: path.historyPurchase,
+                        element: <PurchasePage />,
+                    },
+                ],
             },
             {
                 path: path.cart,
