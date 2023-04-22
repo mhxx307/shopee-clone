@@ -71,3 +71,9 @@ export const getIdFromNameId = (nameId: string) => {
     const arr = nameId.split('-i,');
     return arr[arr.length - 1];
 };
+
+export const getAvatarUrl = (avatarName?: string) => {
+    return avatarName
+        ? `${import.meta.env.VITE_API_URL}images/${avatarName}`
+        : 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png';
+};

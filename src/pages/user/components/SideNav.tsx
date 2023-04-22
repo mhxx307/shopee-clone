@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { path } from 'src/constants';
 import { useAppContext } from 'src/contexts/app.context';
+import { getAvatarUrl } from 'src/utils';
 
 export default function SideNav() {
     const { profile } = useAppContext();
@@ -19,12 +20,8 @@ export default function SideNav() {
                     className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-black/10"
                 >
                     <img
-                        src={
-                            profile.avatar
-                                ? profile.avatar
-                                : 'https://camo.githubusercontent.com/9f35070e23b2720cc87542cad46767ba9851c0ec956f58b0a4bc72d6e7a41372/68747470733a2f2f692e696d6775722e636f6d2f33786a4b50767a2e706e67'
-                        }
-                        alt=""
+                        src={getAvatarUrl(profile.avatar)}
+                        alt={profile.name}
                         className="h-full w-full object-cover"
                     />
                 </Link>

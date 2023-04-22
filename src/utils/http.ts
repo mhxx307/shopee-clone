@@ -57,7 +57,9 @@ class Http {
             },
             (error) => {
                 if (error.response.status === 422) {
-                    const message = error.response.data.message;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const data: any | undefined = error.response?.data;
+                    const message = data?.message || error.message;
                     toast.error(message, {
                         toastId: 'error',
                     });
