@@ -13,6 +13,7 @@ import {
     saveProfile,
 } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
+import { maxSizeUpload } from 'src/constants/upload';
 
 type FormState = Pick<
     UserSchema,
@@ -111,7 +112,13 @@ export default function Profile() {
 
     const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileFromLocal = e.target.files?.[0];
-        if (fileFromLocal) {
+        if (
+            fileFromLocal &&
+            (fileFromLocal?.size >= maxSizeUpload ||
+                !fileFromLocal.type.includes('image'))
+        ) {
+            toast.error('File quá lớn hoặc không đúng định dạng');
+        } else {
             setFile(fileFromLocal);
         }
     };
@@ -130,6 +137,12 @@ export default function Profile() {
             setValue('avatar', profile.avatar);
         }
     }, [profile, setValue]);
+
+    useEffect(() => {
+        return () => {
+            URL.revokeObjectURL(preview);
+        };
+    }, [preview]);
 
     if (!profile) return <div>Not have profile</div>;
 
