@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Button, InputField } from 'src/components/shared';
 import authService from 'src/services/auth.service';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { isAxiosUnprocessableEntityError } from 'src/utils';
 import { ErrorResponseApi } from 'src/types/util.type.ts';
 import { toast } from 'react-toastify';

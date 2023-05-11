@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-named-as-default
 import produce from 'immer';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import { Fragment, useEffect, useMemo } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Link, useLocation } from 'react-router-dom';
