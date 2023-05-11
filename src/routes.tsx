@@ -2,16 +2,18 @@ import { Navigate, Outlet, useRoutes } from 'react-router';
 import { CartLayout, MainLayout, RegisterLayout } from './components/layouts';
 import { path } from './constants';
 import { useAppContext } from './contexts/app.context';
-import {
-    HomePage,
-    LoginPage,
-    RegisterPage,
-    ProductDetailPage,
-    CartPage,
-} from './pages';
-import { ChangePasswordPage, ProfilePage, PurchasePage } from './pages/user';
 import UserLayout from './pages/user/layouts/UserLayout';
-import NotFound from './pages/notFound';
+import { Suspense, lazy } from 'react';
+
+const LoginPage = lazy(() => import('./pages/login'));
+const HomePage = lazy(() => import('./pages/home'));
+const RegisterPage = lazy(() => import('./pages/register'));
+const ProductDetailPage = lazy(() => import('./pages/product-detail'));
+const ChangePasswordPage = lazy(() => import('./pages/user/change-password'));
+const ProfilePage = lazy(() => import('./pages/user/profile'));
+const PurchasePage = lazy(() => import('./pages/user/history-purchase'));
+const CartPage = lazy(() => import('./pages/cart'));
+const NotFoundPage = lazy(() => import('./pages/notFound'));
 
 function ProtectedRoute() {
     const { isAuthenticated } = useAppContext();
@@ -29,7 +31,9 @@ const routes = [
         index: true,
         element: (
             <MainLayout>
-                <HomePage />
+                <Suspense>
+                    <HomePage />
+                </Suspense>
             </MainLayout>
         ),
     },
@@ -38,7 +42,9 @@ const routes = [
         index: true,
         element: (
             <MainLayout>
-                <ProductDetailPage />
+                <Suspense>
+                    <ProductDetailPage />
+                </Suspense>
             </MainLayout>
         ),
     },
@@ -57,15 +63,27 @@ const routes = [
                 children: [
                     {
                         path: path.profile,
-                        element: <ProfilePage />,
+                        element: (
+                            <Suspense>
+                                <ProfilePage />
+                            </Suspense>
+                        ),
                     },
                     {
                         path: path.changePassword,
-                        element: <ChangePasswordPage />,
+                        element: (
+                            <Suspense>
+                                <ChangePasswordPage />
+                            </Suspense>
+                        ),
                     },
                     {
                         path: path.historyPurchase,
-                        element: <PurchasePage />,
+                        element: (
+                            <Suspense>
+                                <PurchasePage />
+                            </Suspense>
+                        ),
                     },
                 ],
             },
@@ -73,7 +91,9 @@ const routes = [
                 path: path.cart,
                 element: (
                     <CartLayout>
-                        <CartPage />
+                        <Suspense>
+                            <CartPage />
+                        </Suspense>
                     </CartLayout>
                 ),
             },
@@ -87,7 +107,9 @@ const routes = [
                 path: path.login,
                 element: (
                     <RegisterLayout>
-                        <LoginPage />
+                        <Suspense>
+                            <LoginPage />
+                        </Suspense>
                     </RegisterLayout>
                 ),
             },
@@ -95,7 +117,9 @@ const routes = [
                 path: path.register,
                 element: (
                     <RegisterLayout>
-                        <RegisterPage />
+                        <Suspense>
+                            <RegisterPage />
+                        </Suspense>
                     </RegisterLayout>
                 ),
             },
@@ -105,7 +129,9 @@ const routes = [
         path: '*',
         element: (
             <MainLayout>
-                <NotFound />
+                <Suspense>
+                    <NotFoundPage />
+                </Suspense>
             </MainLayout>
         ),
     },
