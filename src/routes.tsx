@@ -11,6 +11,7 @@ import {
 } from './pages';
 import { ChangePasswordPage, ProfilePage, PurchasePage } from './pages/user';
 import UserLayout from './pages/user/layouts/UserLayout';
+import NotFound from './pages/notFound';
 
 function ProtectedRoute() {
     const { isAuthenticated } = useAppContext();
@@ -99,6 +100,14 @@ const routes = [
                 ),
             },
         ],
+    },
+    {
+        path: '*',
+        element: (
+            <MainLayout>
+                <NotFound />
+            </MainLayout>
+        ),
     },
 ];
 
